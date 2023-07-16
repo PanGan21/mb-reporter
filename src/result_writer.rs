@@ -31,8 +31,8 @@ pub fn write_results(total_tx_mb: f64, total_rx_mb: f64, measurement_duration: D
         total_consumption_mb,
     };
 
-    // Create the "result" folder if it doesn't exist
-    fs::create_dir_all("result").unwrap();
+    // Create the "results" folder if it doesn't exist
+    fs::create_dir_all("results").unwrap();
 
     let filename = format!(
         "results/result_{}_{}.json",
@@ -49,4 +49,45 @@ pub fn write_results(total_tx_mb: f64, total_rx_mb: f64, measurement_duration: D
 
     info!("Results written to file: {}", filename);
     println!("Total Data Usage: {:.2} MB", total_consumption_mb);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::time::Instant;
+    use tempfile::TempDir;
+
+    #[test]
+    fn test_write_results() {
+        // Create a temporary directory for testing
+        let temp_dir = TempDir::new().unwrap();
+        let temp_dir_path = temp_dir.path();
+
+        // Set the "result" folder path to the temporary directory
+        let result_folder_path = temp_dir_path.join("results");
+
+        // Create the "result" folder
+        fs::create_dir_all("results").unwrap();
+
+        // Define the measurement duration
+        let measurement_duration = Duration::from_secs(60);
+        dbg!("HERE");
+        let write_results_task = tokio::spawn(async move {
+            write_results(10.5, 20.7, measurement_duration);
+        });
+
+        // Get the list of files in the "results" folder
+        let result_files: Vec<_> = fs::read_dir(&result_folder_path)
+            .unwrap()
+            .map(|entry| entry.unwrap().file_name().to_string_lossy().to_string())
+            .collect();
+
+        // Verify that a result file was created
+        assert_eq!(result_files.len(), 1);
+
+        // Verify the content of the result file
+        let result_file_path = result_folder_path.join(&result_files[0]);
+        let result_file_content = fs::read_to_string(&result_file_path).unwrap();
+        assert!(result_file_content.contains("Total Data Usage"));
+    }
 }
