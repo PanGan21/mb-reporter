@@ -47,3 +47,31 @@ pub fn get_data_usage(interface_name: &str) -> DataUsage {
 pub fn bytes_to_megabytes(bytes: u64) -> f64 {
     bytes as f64 / 1_000_000.0
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_data_usage() {
+        let interface_name = "en0";
+
+        let data_usage = get_data_usage(interface_name);
+
+        assert!(data_usage.tx_bytes > 0);
+        assert!(data_usage.rx_bytes > 0);
+    }
+
+    #[test]
+    fn test_bytes_to_megabytes() {
+        // Test a positive value
+        let bytes_positive = 100_000_000;
+        let megabytes_positive = bytes_to_megabytes(bytes_positive);
+        assert_eq!(megabytes_positive, 100.0);
+
+        // Test a value of zero
+        let bytes_zero = 0;
+        let megabytes_zero = bytes_to_megabytes(bytes_zero);
+        assert_eq!(megabytes_zero, 0.0);
+    }
+}

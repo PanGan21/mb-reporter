@@ -9,3 +9,17 @@ impl NetworkInterface {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_network_interface_new() {
+        let name = "en0";
+        let interface = NetworkInterface::new(name);
+
+        // Assert the name property
+        assert_eq!(interface.name, name);
+    }
+}

@@ -45,3 +45,28 @@ impl DataUsageMeasurement {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::time::Duration;
+
+    #[test]
+    fn test_measure_data_usage() {
+        // Create a dummy network interface
+        let interface = NetworkInterface::new("en0");
+
+        // Define the measurement duration
+        let measurement_duration = Duration::from_secs(10);
+
+        // Create a DataUsageMeasurement instance
+        let data_measurement = DataUsageMeasurement::new(interface, measurement_duration);
+
+        // Call the measure_data_usage method
+        let data_usage = data_measurement.measure_data_usage();
+
+        // Verify that the data usage is greater than 0
+        assert!(data_usage.tx_bytes > 0);
+        assert!(data_usage.rx_bytes > 0);
+    }
+}

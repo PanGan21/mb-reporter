@@ -10,7 +10,8 @@ mod measurement;
 mod network_interface;
 mod result_writer;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     env_logger::init();
 
     let interface = NetworkInterface::new("en0");
@@ -25,5 +26,5 @@ fn main() {
     println!("Total Data Usage - Transmit: {:.2} MB", total_tx_mb);
     println!("Total Data Usage - Receive: {:.2} MB", total_rx_mb);
 
-    write_results(total_tx_mb, total_rx_mb, measurement_duration);
+    write_results(total_tx_mb, total_rx_mb, measurement_duration).await;
 }
